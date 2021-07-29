@@ -72,7 +72,6 @@
 #define IC3_CS      41       
 #define IC4_CS      39
 
-
 // Relay Control
 #define RELAY1_1    35 
 #define RELAY1_2    37
