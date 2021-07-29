@@ -108,7 +108,6 @@ const int Temp_R4 = A13;
 #define VOLTREAD  0.0012 // 5/4096 = 0.0012 ; 5 = Vref ; 4096 = ADC 12 bit resolution
 #define I_CONST   4.166 // 1.25/0.3 = 4.166 R = 0.3 ohm on board devider Vref of LM317 (1.25V)
 
-
 RotaryEncoder encoder(A8, A9);
 
 String inputString = ""; // a String to hold incoming data
