@@ -53,8 +53,8 @@
 #define ROTARYMIN 1
 #define ROTARYMAX 32
 
-#define COM  0
-#define STAN 1
+#define COM  1
+#define STAN 0
 
 #define Mode  5
 #define Playpausebtn  A10
@@ -295,7 +295,7 @@ void setup()
   
   // Switch PIN
   pinMode(Mode, INPUT_PULLUP);
-  pinMode(Playpausebtn, INPUT);
+  pinMode(Playpausebtn, INPUT_PULLUP);
 
   pinMode(BUZZER, OUTPUT);
   digitalWrite(BUZZER, HIGH);
@@ -381,7 +381,7 @@ void setup()
   lcd4.setCursor(0, 2); lcd4.print("27:--- 30:---       ");
   lcd4.setCursor(0, 3); lcd4.print("  unit = milliohm   ");
 
-  if(digitalRead(Mode))
+  if(digitalRead(Mode)==0)
   {
     workmode = STAN;
   }
@@ -397,7 +397,7 @@ void setup()
 
   lcd1.setCursor(0, 2);lcd1.print("Test LED please wait");
   // %%%%%%%%%% LED Test Lamp %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-   for(byte i = 0; i < 2; i++)
+   for(byte i = 0; i < 5; i++)
   {
     green1_8 =255; 
     green9_16 =255; 
@@ -424,14 +424,14 @@ void setup()
     delay(500);
   }
     
-  green1_8 =0; 
-  green9_16 =0; 
-  green17_24 =0; 
-  green25_32 =0;
-  red1_8 =0; 
-  red9_16 =0; 
-  red17_24 =0; 
-  red25_32 =0;
+  green1_8 = 0; 
+  green9_16 = 0; 
+  green17_24 = 0; 
+  green25_32 = 0;
+  red1_8 = 0; 
+  red9_16 = 0; 
+  red17_24 = 0; 
+  red25_32 = 0;
   lampdrive();
 
   lcd1.setCursor(0, 2);lcd1.print("Contact Qty. :      ");
@@ -445,7 +445,7 @@ void setup()
   digitalWrite(FAN2, LOW); // Test FAN2 ON
   delay(100); 
   digitalWrite(BUZZER, HIGH); //BUZZER OFF
-  delay(500);
+  //delay(500);
   digitalWrite(FAN1, HIGH); // FAN1 OFF
   digitalWrite(FAN2, HIGH); // FAN2 OFF
 
@@ -455,7 +455,7 @@ void loop()
 {
   
   // **** Test Read ADC Temp  ****************//
-
+/*
   if((flagreadtemp)&&(play ==0))
   {
     flagreadtemp = 0; 
@@ -474,7 +474,7 @@ void loop()
     } 
 
   }
-  
+ */ 
   // *****************************************//
   
   float ohmraw;
@@ -524,34 +524,34 @@ void loop()
   if((startmeasure == true) && (loopcount != 0))
   {
     buffreadtemp = readmcp3208(loopcount);
-	mcpdata = mcpdata + buffreadtemp;
-
-	buffreadtemp = readmcp3208(loopcount);
-	mcpdata = mcpdata + buffreadtemp;
-
-	buffreadtemp = readmcp3208(loopcount);
-	mcpdata = mcpdata + buffreadtemp;
-
-	buffreadtemp = readmcp3208(loopcount);
-	mcpdata = mcpdata + buffreadtemp;
-
-	buffreadtemp = readmcp3208(loopcount);
-	mcpdata = mcpdata + buffreadtemp;
-
-	buffreadtemp = readmcp3208(loopcount);
-	mcpdata = mcpdata + buffreadtemp;
-
-	buffreadtemp = readmcp3208(loopcount);
-	mcpdata = mcpdata + buffreadtemp;
-
-	buffreadtemp = readmcp3208(loopcount);
-	mcpdata = mcpdata + buffreadtemp;
-
-	buffreadtemp = readmcp3208(loopcount);
-	mcpdata = mcpdata + buffreadtemp;
-
-	buffreadtemp = readmcp3208(loopcount);
-	mcpdata = mcpdata + buffreadtemp;
+  	mcpdata = mcpdata + buffreadtemp;
+  
+  	buffreadtemp = readmcp3208(loopcount);
+  	mcpdata = mcpdata + buffreadtemp;
+  
+  	buffreadtemp = readmcp3208(loopcount);
+  	mcpdata = mcpdata + buffreadtemp;
+  
+  	buffreadtemp = readmcp3208(loopcount);
+  	mcpdata = mcpdata + buffreadtemp;
+  
+  	buffreadtemp = readmcp3208(loopcount);
+  	mcpdata = mcpdata + buffreadtemp;
+  
+  	buffreadtemp = readmcp3208(loopcount);
+  	mcpdata = mcpdata + buffreadtemp;
+  
+  	buffreadtemp = readmcp3208(loopcount);
+  	mcpdata = mcpdata + buffreadtemp;
+  
+  	buffreadtemp = readmcp3208(loopcount);
+  	mcpdata = mcpdata + buffreadtemp;
+  
+  	buffreadtemp = readmcp3208(loopcount);
+  	mcpdata = mcpdata + buffreadtemp;
+  
+  	buffreadtemp = readmcp3208(loopcount);
+  	mcpdata = mcpdata + buffreadtemp;
 
 /* 	buffreadtemp = readmcp3208(loopcount);
 	mcpdata = mcpdata + buffreadtemp;
@@ -572,7 +572,7 @@ void loop()
 	Serial.println(mcpdata);
 	delay(500); */
 	
-	ohmraw = calculate_display((mcpdata/10) , loopcount);
+	  ohmraw = calculate_display((mcpdata/10) , loopcount);
 	
     lampdrive(); 
     if(workmode == COM){ // if com mode send data
@@ -592,10 +592,34 @@ void loop()
       }
     }
     
-    
+    // jj 10.31
     if(++loopcount > readnum)
     {
-		// jj 7/4/21
+      if(play == 0)
+      {
+        startmeasure = false;
+        loopcount = 0;
+        //lcd1.setCursor(0, 3);lcd1.print("Scan         :");
+        lcd1.setCursor(0, 3);lcd1.print("Scan Complete:");
+        
+        // Off All Relay
+        digitalWrite(RELAY1_1, HIGH);
+          digitalWrite(RELAY1_2, HIGH);
+          digitalWrite(RELAY2_1, HIGH);
+          digitalWrite(RELAY2_2, HIGH);
+          digitalWrite(RELAY3_1, HIGH);
+          digitalWrite(RELAY3_2, HIGH);
+          digitalWrite(RELAY4_1, HIGH);
+          digitalWrite(RELAY4_2, HIGH); 
+        //Beep
+        digitalWrite(BUZZER, LOW); // 
+        delay(300);
+        digitalWrite(BUZZER, HIGH);
+      }
+      
+     loopcount = 1; // jj 30/7/64
+
+/*
 		play = 0;
 		startmeasure = false;
         loopcount = 0;
@@ -615,16 +639,10 @@ void loop()
 		digitalWrite(BUZZER, LOW); // 
 		delay(300);
 		digitalWrite(BUZZER, HIGH);
-      /* loopcount = 1;
-
-      // stop scan when complete loop scan
-      if(play ==0){
-        startmeasure = false;
-        loopcount = 0;
-        lcd1.setCursor(0, 3);lcd1.print("Scan         :");
-      } */
+*/
       
-    }         
+    }
+         
     delay(100); 
   }
   else
@@ -1057,7 +1075,7 @@ unsigned char readrotary(void)
 void readmode(void)
 {
   static byte oldmode ;
-  if(digitalRead(Mode))
+  if(!(digitalRead(Mode)))
   {
     workmode = STAN;
   }
