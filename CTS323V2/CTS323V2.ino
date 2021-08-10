@@ -87,8 +87,6 @@
 
 #define BUZZER      7
 
-
-
 const int Temp_L1 = A3;
 const int Temp_L2 = A4;
 const int Temp_L3 = A5;
@@ -106,7 +104,8 @@ const int Temp_R4 = A13;
 
      /*   Range 0 - 1.08 Ohm    */  
 #define VOLTREAD  0.0012 // 5/4096 = 0.0012 ; 5 = Vref ; 4096 = ADC 12 bit resolution
-#define I_CONST   4.166 // 1.25/0.3 = 4.166 R = 0.3 ohm on board devider Vref of LM317 (1.25V)
+//#define I_CONST   4.166 // 1.25/0.3 = 4.166 R = 0.3 ohm on board devider Vref of LM317 (1.25V)
+#define I_CONST   4.629 // 1.25/0.27 = 4.166 R = 0.27 ohm on board devider Vref of LM317 (1.25V)
 
 RotaryEncoder encoder(A8, A9);
 
@@ -191,7 +190,9 @@ void serialEvent()  {
           loopcount =1;
           cleardisplay();
           play = 1 ;
-		  lcd1.setCursor(0, 3);lcd1.print("Scanning     :");
+		      lcd1.setCursor(0, 3);lcd1.print("Scanning     :");
+          digitalWrite(FAN1, LOW); // Test FAN1 ON
+          digitalWrite(FAN2, LOW); // Test FAN2 ON
         }
         else
         {
@@ -337,8 +338,8 @@ void setup()
   
   pinMode(FAN1, OUTPUT); 
   pinMode(FAN2, OUTPUT);
-  digitalWrite(FAN1, LOW);
-  digitalWrite(FAN2, LOW);
+  //digitalWrite(FAN1, LOW);
+  //digitalWrite(FAN2, LOW);
   
   // initialize Serial
   Serial.begin(9600);
@@ -406,8 +407,7 @@ void setup()
     red1_8 =0; 
     red9_16 =0; 
     red17_24 =0; 
-    red25_32 =0;
-    
+    red25_32 =0;    
     lampdrive();
     delay(500);
     
@@ -419,7 +419,6 @@ void setup()
     red9_16 =255; 
     red17_24 =255; 
     red25_32 =255;
-    
     lampdrive();    
     delay(500);
   }
@@ -441,11 +440,12 @@ void setup()
   encoder.setPosition(1);
   
   digitalWrite(BUZZER, LOW); // Test BUZZER ON
-  digitalWrite(FAN1, LOW); // Test FAN1 ON
-  digitalWrite(FAN2, LOW); // Test FAN2 ON
+  //digitalWrite(FAN1, LOW); // Test FAN1 ON
+  //digitalWrite(FAN2, LOW); // Test FAN2 ON
   delay(100); 
   digitalWrite(BUZZER, HIGH); //BUZZER OFF
   //delay(500);
+
   digitalWrite(FAN1, HIGH); // FAN1 OFF
   digitalWrite(FAN2, HIGH); // FAN2 OFF
 
@@ -455,7 +455,7 @@ void loop()
 {
   
   // **** Test Read ADC Temp  ****************//
-/*
+/*5
   if((flagreadtemp)&&(play ==0))
   {
     flagreadtemp = 0; 
@@ -525,7 +525,7 @@ void loop()
   {
     buffreadtemp = readmcp3208(loopcount);
   	mcpdata = mcpdata + buffreadtemp;
-  
+   
   	buffreadtemp = readmcp3208(loopcount);
   	mcpdata = mcpdata + buffreadtemp;
   
@@ -552,6 +552,7 @@ void loop()
   
   	buffreadtemp = readmcp3208(loopcount);
   	mcpdata = mcpdata + buffreadtemp;
+
 
 /* 	buffreadtemp = readmcp3208(loopcount);
 	mcpdata = mcpdata + buffreadtemp;
@@ -573,7 +574,7 @@ void loop()
 	delay(500); */
 	
 	  ohmraw = calculate_display((mcpdata/10) , loopcount);
-	
+ 
     lampdrive(); 
     if(workmode == COM){ // if com mode send data
       Serial.print(loopcount/10);
@@ -595,6 +596,8 @@ void loop()
     // jj 10.31
     if(++loopcount > readnum)
     {
+      play = false;
+      
       if(play == 0)
       {
         startmeasure = false;
@@ -604,17 +607,21 @@ void loop()
         
         // Off All Relay
         digitalWrite(RELAY1_1, HIGH);
-          digitalWrite(RELAY1_2, HIGH);
-          digitalWrite(RELAY2_1, HIGH);
-          digitalWrite(RELAY2_2, HIGH);
-          digitalWrite(RELAY3_1, HIGH);
-          digitalWrite(RELAY3_2, HIGH);
-          digitalWrite(RELAY4_1, HIGH);
-          digitalWrite(RELAY4_2, HIGH); 
+        digitalWrite(RELAY1_2, HIGH);
+        digitalWrite(RELAY2_1, HIGH);
+        digitalWrite(RELAY2_2, HIGH);
+        digitalWrite(RELAY3_1, HIGH);
+        digitalWrite(RELAY3_2, HIGH);
+        digitalWrite(RELAY4_1, HIGH);
+        digitalWrite(RELAY4_2, HIGH); 
         //Beep
-        digitalWrite(BUZZER, LOW); // 
+        digitalWrite(BUZZER, LOW); //
+        digitalWrite(FAN1, HIGH); // FAN1 OFF
+        digitalWrite(FAN2, HIGH); // FAN2 OFF
         delay(300);
         digitalWrite(BUZZER, HIGH);
+        delay(500);
+         
       }
       
      loopcount = 1; // jj 30/7/64
@@ -1119,6 +1126,9 @@ void readplaypause(void)
           startmeasure = true;
           lcd1.setCursor(0, 3);lcd1.print("Scanning     :");
           cleardisplay();
+          digitalWrite(FAN1, LOW); // Test FAN1 ON
+          digitalWrite(FAN2, LOW); // Test FAN2 ON
+
         }       
       }
       
@@ -1444,25 +1454,25 @@ int meaheatsinktemp(void)
 
   // Read Temp Heat sink Right 
   if((Temp1 > MAXTEMP) || (Temp2 > MAXTEMP) || (Temp3 > MAXTEMP) || (Temp4 > MAXTEMP)){
-  digitalWrite(FAN1, LOW); //FAN1 ON
+  //digitalWrite(FAN1, LOW); //FAN1 ON
   }
   else if((Temp1 < MINTEMP) && (Temp2 < MINTEMP) && (Temp3 < MINTEMP) && (Temp4 < MINTEMP) ){
-  digitalWrite(FAN1, HIGH); //FAN1 OFF
+  //digitalWrite(FAN1, HIGH); //FAN1 OFF
   }
   else if((Temp1 > OVERHEAT) || (Temp2 > OVERHEAT) || (Temp3 > OVERHEAT) || (Temp4 > OVERHEAT)){
-  digitalWrite(FAN1, LOW); //FAN1 ON
+  //digitalWrite(FAN1, LOW); //FAN1 ON
   digitalWrite(BUZZER, LOW); // Test BUZZER ON
   stat = 1;
   }
     
   if((Temp5 > MAXTEMP) || (Temp6 > MAXTEMP) || (Temp7 > MAXTEMP) || (Temp8 > MAXTEMP)){
-    digitalWrite(FAN2, LOW); //FAN1 ON
+    //digitalWrite(FAN2, LOW); //FAN1 ON
   }
   else if((Temp5 < MINTEMP) && (Temp6 < MINTEMP) && (Temp7 < MINTEMP) && (Temp8 < MINTEMP) ){
-    digitalWrite(FAN2, HIGH); //FAN1 OFF
+    //digitalWrite(FAN2, HIGH); //FAN1 OFF
   }
   else if((Temp5 > OVERHEAT) || (Temp6 > OVERHEAT) || (Temp7 > OVERHEAT) || (Temp8 > OVERHEAT)){
-    digitalWrite(FAN2, LOW); //FAN1 ON
+    //digitalWrite(FAN2, LOW); //FAN1 ON
     digitalWrite(BUZZER, LOW); // Test BUZZER ON
     stat = 1;
   }
