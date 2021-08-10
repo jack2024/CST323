@@ -193,6 +193,7 @@ void serialEvent()  {
 		      lcd1.setCursor(0, 3);lcd1.print("Scanning     :");
           digitalWrite(FAN1, LOW); // Test FAN1 ON
           digitalWrite(FAN2, LOW); // Test FAN2 ON
+          delay(250);
         }
         else
         {
@@ -583,7 +584,7 @@ void loop()
       //ohmraw = readmcp3208(loopcount);  
       //lampdrive(); 
       
-      if(ohmraw > 1.0 ) // Max 1.179
+      if(ohmraw > 0.8 ) // Max 1.179
       {
         Serial.println("-.---");
       }
@@ -1101,7 +1102,7 @@ void readplaypause(void)
     if(digitalRead(Playpausebtn) ==0)
     {
 	  beep();
-      delay(500); 
+      delay(100); 
       if(play)
       {
         play = 0; 
@@ -1128,7 +1129,7 @@ void readplaypause(void)
           cleardisplay();
           digitalWrite(FAN1, LOW); // Test FAN1 ON
           digitalWrite(FAN2, LOW); // Test FAN2 ON
-
+          delay(500);
         }       
       }
       
@@ -1535,6 +1536,7 @@ float calculate_display(uint16_t raw ,uint8_t ch)
   {
     case 1:
       if(ohmmilli >= MAXRESISTANT){
+        //ohmmilli = 1200; // jj10/8/64
         lcd2.setCursor(3, 0); lcd2.print("---");
         bitWrite(red1_8, 0, 1); bitWrite(green1_8, 0, 0);
       }
